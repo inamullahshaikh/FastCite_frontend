@@ -1,0 +1,203 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    /* Primary Colors - Darker Theme (Claude-inspired) */
+    --color-bg-primary: #0f0f0f;
+    --color-bg-secondary: #1a1a1a;
+    --color-bg-tertiary: #242424;
+    
+    /* Surface Colors */
+    --color-surface-primary: #171717;
+    --color-surface-secondary: #1f1f1f;
+    --color-surface-hover: #2a2a2a;
+    
+    /* Text Colors */
+    --color-text-primary: #e8e8e8;
+    --color-text-secondary: #a0a0a0;
+    --color-text-tertiary: #707070;
+    --color-text-disabled: #4a4a4a;
+    
+    /* Accent Colors - Warmer tones */
+    --color-accent-primary: #cc8b65;
+    --color-accent-secondary: #d4a574;
+    --color-accent-hover: #e0b589;
+    
+    /* Border Colors */
+    --color-border-primary: #2a2a2a;
+    --color-border-secondary: #363636;
+    --color-border-focus: #4a4a4a;
+    
+    /* Message Bubble Colors */
+    --color-user-message: #262626;
+    --color-assistant-message: #1a1a1a;
+    
+    /* Status Colors */
+    --color-success: #4ade80;
+    --color-error: #ef4444;
+    --color-warning: #fbbf24;
+    --color-info: #60a5fa;
+    
+    /* Shadows - Deeper for dark theme */
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.5);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.6);
+    
+    /* Spacing & Sizing */
+    --header-height: 64px;
+    --sidebar-width: 280px;
+    --input-height: 56px;
+  }
+  
+  * {
+    @apply border-[var(--color-border-primary)];
+  }
+
+  body {
+    @apply bg-[var(--color-bg-primary)] text-[var(--color-text-primary)];
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+      'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+      sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  
+  code {
+    font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+      monospace;
+  }
+}
+
+@layer components {
+  /* Scrollbar Styles */
+  .custom-scrollbar::-webkit-scrollbar {
+    @apply w-2;
+  }
+  
+  .custom-scrollbar::-webkit-scrollbar-track {
+    @apply bg-transparent;
+  }
+  
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    @apply bg-[var(--color-border-secondary)] rounded-full hover:bg-[var(--color-border-focus)];
+  }
+  
+  /* Button Base Styles */
+  .btn-primary {
+    @apply bg-[var(--color-accent-primary)] hover:bg-[var(--color-accent-hover)] 
+           text-white px-4 py-2 rounded-lg 
+           transition-all duration-200 font-medium
+           shadow-sm hover:shadow-md;
+  }
+  
+  .btn-secondary {
+    @apply bg-[var(--color-surface-secondary)] hover:bg-[var(--color-surface-hover)] 
+           text-[var(--color-text-primary)] px-4 py-2 rounded-lg 
+           transition-all duration-200 font-medium
+           border border-[var(--color-border-primary)];
+  }
+  
+  .btn-ghost {
+    @apply hover:bg-[var(--color-surface-hover)] text-[var(--color-text-primary)] 
+           px-4 py-2 rounded-lg transition-colors duration-200;
+  }
+  
+  /* Input Styles */
+  .input-primary {
+    @apply bg-[var(--color-surface-secondary)] border border-[var(--color-border-primary)]
+           text-[var(--color-text-primary)] rounded-lg px-4 py-2
+           focus:outline-none focus:border-[var(--color-accent-primary)] focus:ring-1 focus:ring-[var(--color-accent-primary)]
+           placeholder:text-[var(--color-text-tertiary)]
+           transition-all duration-200;
+  }
+  
+  /* Card Styles */
+  .card {
+    @apply bg-[var(--color-surface-primary)] rounded-xl 
+           border border-[var(--color-border-primary)] p-4
+           shadow-md;
+  }
+  
+  /* Message Bubble Styles */
+  .message-user {
+    @apply bg-[var(--color-user-message)] rounded-2xl px-4 py-3
+           border border-[var(--color-border-primary)];
+  }
+  
+  .message-assistant {
+    @apply bg-[var(--color-assistant-message)] rounded-2xl px-4 py-3;
+  }
+  
+  /* Divider */
+  .divider {
+    @apply border-t border-[var(--color-border-primary)];
+  }
+  
+  /* Link Styles */
+  .link {
+    @apply text-[var(--color-accent-secondary)] hover:text-[var(--color-accent-hover)]
+           transition-colors duration-200 underline;
+  }
+}
+
+@layer utilities {
+  /* Text Utilities */
+  .text-primary {
+    color: var(--color-text-primary);
+  }
+  
+  .text-secondary {
+    color: var(--color-text-secondary);
+  }
+  
+  .text-tertiary {
+    color: var(--color-text-tertiary);
+  }
+  
+  /* Background Utilities */
+  .bg-primary {
+    background-color: var(--color-bg-primary);
+  }
+  
+  .bg-secondary {
+    background-color: var(--color-bg-secondary);
+  }
+  
+  .bg-surface {
+    background-color: var(--color-surface-primary);
+  }
+  
+  /* Animation Utilities */
+  .animate-fade-in {
+    animation: fadeIn 0.3s ease-in;
+  }
+  
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  .animate-slide-in {
+    animation: slideIn 0.3s ease-out;
+  }
+  
+  @keyframes slideIn {
+    from {
+      transform: translateX(-100%);
+    }
+    to {
+      transform: translateX(0);
+    }
+  }
+  
+  /* Loading Spinner */
+  .spinner {
+    @apply animate-spin rounded-full border-2 border-[var(--color-border-primary)] border-t-[var(--color-accent-primary)];
+  }
+} /* ✅ <—— This was missing! */
