@@ -17,7 +17,7 @@ import {
   Library,
   MessageSquare,
 } from "lucide-react";
-
+import { useNavigate } from "react-router-dom";
 const API_BASE_URL = "http://localhost:8000";
 import Sidebar from "../components/Sidebar";
 
@@ -229,7 +229,7 @@ export default function ManageBooksPage() {
   const [bookToDelete, setBookToDelete] = useState(null);
   const [isDeleting, setIsDeleting] = useState(false);
   const [toast, setToast] = useState(null);
-
+  const navigate = useNavigate()
   // Fetch books
   const fetchBooks = async () => {
     try {
@@ -238,6 +238,7 @@ export default function ManageBooksPage() {
       
       if (!token) {
         setToast({ message: "Please log in to view your books", type: "error" });
+        navigate("/login")
         return;
       }
 

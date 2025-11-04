@@ -12,8 +12,8 @@ const GoogleRedirectHandler = () => {
 
     if (token) {
       // Store token in localStorage (or sessionStorage)
-      localStorage.setItem("access_token", token);
-
+      localStorage.setItem("accessToken", token);
+      console.log(token)
       // Remove token from URL for cleanliness
       // Keeps the history entry and changes URL without reloading
       const newUrl = location.pathname.replace("/auth/google/callback", "/dashboard");

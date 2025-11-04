@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import Sidebar from "../components/Sidebar";
 const API_BASE_URL = "http://localhost:8000";
+import { useNavigate } from "react-router-dom";
 
 /**
  * Status badge component for upload tasks
@@ -215,7 +216,7 @@ export default function UploadPage() {
   const [loadingBooks, setLoadingBooks] = useState(true);
   const [error, setError] = useState(null);
   const [dragActive, setDragActive] = useState(false);
-
+  const navigate = useNavigate();
   // Fetch user's books
   useEffect(() => {
     fetchMyBooks();
@@ -242,8 +243,9 @@ export default function UploadPage() {
     try {
       setLoadingBooks(true);
       const token = localStorage.getItem("accessToken");
-      if (!token) return;
-
+      if (!token){
+        navigate("/login")
+      }
       const response = await fetch(`${API_BASE_URL}/books/me`, {
         headers: {
           Authorization: `Bearer ${token}`,
