@@ -4,11 +4,11 @@ import {
   PlusSquare, 
   FileUp, 
   Library, 
-  Sparkles,
   User,
   LogOut
 } from 'lucide-react';
-import logo from "../assets/logo.png"; // Assuming logo is in src/assets/
+import logo from "../assets/logo.png";
+import { useNavigate, useLocation } from "react-router-dom";
 
 // Mock data for previous chats - replace this with your actual data
 const mockChats = [
@@ -29,71 +29,111 @@ const mockChats = [
   { id: 15, title: 'Benefits of Mindfulness' },
 ];
 
-// Reusable NavLink component for styling
-const NavLink = ({ href, icon: Icon, children, isPrimary = false }) => {
-  const baseStyle = "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors duration-150";
+// Reusable NavLink component for styling with navigation
+const NavLink = ({ path, icon: Icon, children, isPrimary = false, isActive = false, onClick }) => {
+  const navigate = useNavigate();
+  
+  const baseStyle = "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors duration-150 cursor-pointer";
   const primaryStyle = "bg-[var(--color-accent-primary)] text-white font-semibold hover:bg-[var(--color-accent-hover)]";
+  const activeStyle = "bg-[var(--color-surface-secondary)] text-[var(--color-accent-primary)] font-semibold";
   const secondaryStyle = "text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-secondary)] hover:text-[var(--color-text-primary)]";
 
+  const handleClick = (e) => {
+    e.preventDefault();
+    if (onClick) {
+      onClick(e);
+    } else {
+      navigate(path);
+    }
+  };
+
   return (
-    <a
-      href={href}
-      className={`${baseStyle} ${isPrimary ? primaryStyle : secondaryStyle}`}
+    <div
+      onClick={handleClick}
+      className={`${baseStyle} ${isPrimary ? primaryStyle : isActive ? activeStyle : secondaryStyle}`}
     >
       <Icon className="w-5 h-5" />
       <span>{children}</span>
-    </a>
+    </div>
   );
 };
 
-// Reusable ChatLink component for styling
-const ChatLink = ({ href, title }) => (
-  <a
-    href={href}
-    className="block truncate px-3 py-2.5 rounded-lg text-sm text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-secondary)] hover:text-[var(--color-text-primary)] transition-colors duration-150"
-  >
-    {title}
-  </a>
-);
+// Reusable ChatLink component for styling with navigation
+const ChatLink = ({ chatId, title, isActive }) => {
+  const navigate = useNavigate();
+
+  const handleClick = () => {
+    navigate(`/chat/${chatId}`);
+  };
+
+  return (
+    <div
+      onClick={handleClick}
+      className={`block truncate px-3 py-2.5 rounded-lg text-sm transition-colors duration-150 cursor-pointer ${
+        isActive 
+          ? 'bg-[var(--color-surface-secondary)] text-[var(--color-accent-primary)] font-medium' 
+          : 'text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-secondary)] hover:text-[var(--color-text-primary)]'
+      }`}
+    >
+      {title}
+    </div>
+  );
+};
 
 export default function Sidebar() {
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  // Logout handler
+  const handleLogout = (e) => {
+    e.preventDefault();
+    localStorage.removeItem("accessToken");
+    navigate("/login");
+  };
+
+  // Helper function to check if a path is active
+  const isPathActive = (path) => {
+    return location.pathname === path;
+  };
+
+  // Helper function to check if a chat is active
+  const isChatActive = (chatId) => {
+    return location.pathname === `/chat/${chatId}`;
+  };
+
   // Fallback for logo
   const logoUrl = "https://placehold.co/64x64/6366f1/ffffff?text=FC&font=sans";
 
   return (
     <div className="h-screen w-72 flex flex-col bg-[var(--color-surface-primary)] border-r border-[var(--color-border-primary)]">
       
-      {/* Custom CSS for a dark, minimal scrollbar.
-        This <style> tag is placed here to keep everything in one file.
-        In a real app, this would ideally go in your global index.css file.
-      */}
+      {/* Custom CSS for a dark, minimal scrollbar */}
       <style>
         {`
           /* For Webkit browsers (Chrome, Safari, Edge) */
           .custom-scrollbar::-webkit-scrollbar {
-            width: 8px; /* Width of the scrollbar */
+            width: 8px;
           }
 
           .custom-scrollbar::-webkit-scrollbar-track {
-            background: var(--color-surface-primary); /* Track background, same as sidebar */
+            background: var(--color-surface-primary);
             border-radius: 10px;
           }
 
           .custom-scrollbar::-webkit-scrollbar-thumb {
-            background: #4a4a4a; /* A dark, minimal color for the thumb */
+            background: #4a4a4a;
             border-radius: 10px;
-            /* Add a border to create a "padding" effect so thumb doesn't touch the edge */
             border: 2px solid var(--color-surface-primary);
           }
 
           .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-            background: #555; /* Slightly lighter on hover */
+            background: #555;
           }
           
           /* For Firefox */
           .custom-scrollbar {
-            scrollbar-width: thin; /* "thin" or "auto" */
-            scrollbar-color: #4a4a4a var(--color-surface-primary); /* thumb and track color */
+            scrollbar-width: thin;
+            scrollbar-color: #4a4a4a var(--color-surface-primary);
           }
         `}
       </style>
@@ -103,12 +143,11 @@ export default function Sidebar() {
         {/* Logo and App Name */}
         <div className="flex items-center gap-2 sm:gap-3 p-6">
           <img 
-            src={logo} // Original path
+            src={logo}
             alt="FastCite Logo" 
             className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg object-contain"
             onError={(e) => {
-              // Fallback to a placeholder if the logo fails to load
-              e.target.onerror = null; // prevent infinite loop
+              e.target.onerror = null;
               e.target.src = logoUrl;
             }}
           />
@@ -118,16 +157,32 @@ export default function Sidebar() {
         {/* Main Navigation */}
         <nav className="px-4 pb-4">
           <div className="space-y-2">
-            <NavLink href="/new-chat" icon={PlusSquare} isPrimary>
+            <NavLink 
+              path="/new-chat" 
+              icon={PlusSquare} 
+              isPrimary={true}
+            >
               New Chat
             </NavLink>
-            <NavLink href="/dashboard" icon={LayoutDashboard}>
+            <NavLink 
+              path="/dashboard" 
+              icon={LayoutDashboard}
+              isActive={isPathActive('/dashboard')}
+            >
               Dashboard
             </NavLink>
-            <NavLink href="/upload" icon={FileUp}>
+            <NavLink 
+              path="/upload" 
+              icon={FileUp}
+              isActive={isPathActive('/upload')}
+            >
               Upload Document
             </NavLink>
-            <NavLink href="/manage" icon={Library}>
+            <NavLink 
+              path="/manage" 
+              icon={Library}
+              isActive={isPathActive('/manage')}
+            >
               Manage Uploads
             </NavLink>
           </div>
@@ -135,7 +190,6 @@ export default function Sidebar() {
       </div>
 
       {/* 2. Middle Section (Chat History) - Scrollable */}
-      {/* We add the 'custom-scrollbar' class here */}
       <div className="flex-1 overflow-y-auto px-4 custom-scrollbar">
         {/* Header for chat list */}
         <div className="h-10 flex items-center sticky top-0 bg-[var(--color-surface-primary)]">
@@ -148,9 +202,10 @@ export default function Sidebar() {
         <div className="space-y-1 pb-4">
           {mockChats.map(chat => (
             <ChatLink 
-              key={chat.id} 
-              href={`/chat/${chat.id}`} 
-              title={chat.title} 
+              key={chat.id}
+              chatId={chat.id}
+              title={chat.title}
+              isActive={isChatActive(chat.id)}
             />
           ))}
         </div>
@@ -159,10 +214,18 @@ export default function Sidebar() {
       {/* 3. Bottom Section (User Profile) - Fixed */}
       <div className="flex-shrink-0 p-4 border-t border-[var(--color-border-primary)]">
         <div className="space-y-2">
-          <NavLink href="/profile" icon={User}>
+          <NavLink 
+            path="/profile" 
+            icon={User}
+            isActive={isPathActive('/profile')}
+          >
             My Profile
           </NavLink>
-          <NavLink href="/logout" icon={LogOut}>
+          <NavLink 
+            path="/login" 
+            icon={LogOut}
+            onClick={handleLogout}
+          >
             Log Out
           </NavLink>
         </div>

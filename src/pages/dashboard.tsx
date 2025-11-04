@@ -93,10 +93,10 @@ export default function DashboardPage() {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         };
-
+        console.log(headers)
         // Fetch user data and books in parallel
         const [userResponse, booksResponse] = await Promise.all([
-          fetch(`${API_BASE_URL}/users/me`, { headers }),
+          fetch(`${API_BASE_URL}/users/getmyprofile/me`, { headers }),
           fetch(`${API_BASE_URL}/books/me`, { headers }),
         ]);
 
@@ -129,7 +129,7 @@ export default function DashboardPage() {
         // Calculate analytics from books data
         const totalBooks = booksData.length;
         const booksReady = booksData.filter(
-          (book) => book.status === "ready"
+          (book) => book.status === "complete"
         ).length;
         const booksProcessing = booksData.filter(
           (book) => book.status === "processing"

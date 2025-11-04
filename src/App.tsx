@@ -9,7 +9,8 @@ import SignupPage from "./pages/SignUpPage";
 import LoginPage from "./pages/LoginPage";
 import DashboardPage from "./pages/dashboard";
 import GoogleRedirectHandler from "./pages/GoogleRedirectHandler"; // create this
-
+import UploadPage from "./pages/uploadbook"
+import ManageBooksPage from "./pages/managebooks";
 // ProtectedRoute component
 const ProtectedRoute = ({ children }: { children: JSX.Element }) => {
   const token = localStorage.getItem("access_token");
@@ -39,6 +40,8 @@ function App() {
             </ProtectedRoute>
           }
         />
+        <Route path="/upload" element={<UploadPage />} />
+        <Route path="/manage" element={<ManageBooksPage/>} />
       </Routes>
     </Router>
   );
