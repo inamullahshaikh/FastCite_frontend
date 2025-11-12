@@ -11,6 +11,7 @@ import DashboardPage from "./pages/dashboard";
 import GoogleRedirectHandler from "./pages/GoogleRedirectHandler"; // create this
 import UploadPage from "./pages/uploadbook"
 import ManageBooksPage from "./pages/managebooks";
+import NewChatPage from "./pages/newchat";
 // ProtectedRoute component
 const ProtectedRoute = ({ children }: { children: JSX.Element }) => {
   const token = localStorage.getItem("access_token");
@@ -41,6 +42,7 @@ function App() {
           }
         />
         <Route path="/upload" element={<UploadPage />} />
+        <Route path="/new-chat" element={<NewChatPage/>}/>
         <Route path="/manage" element={<ManageBooksPage/>} />
       </Routes>
     </Router>

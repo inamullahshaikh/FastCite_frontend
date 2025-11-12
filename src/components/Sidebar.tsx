@@ -44,6 +44,7 @@ const NavLink = ({ path, icon: Icon, children, isPrimary = false, isActive = fal
       onClick(e);
     } else {
       navigate(path);
+      window.location.reload(); // ✅ force full reload after navigation
     }
   };
 
