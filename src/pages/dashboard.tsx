@@ -93,7 +93,8 @@ export default function DashboardPage() {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         };
-        console.log(headers)
+        console.log(headers);
+
         // Fetch user data and books in parallel
         const [userResponse, booksResponse] = await Promise.all([
           fetch(`${API_BASE_URL}/users/getmyprofile/me`, { headers }),
@@ -135,12 +136,30 @@ export default function DashboardPage() {
           (book) => book.status === "processing"
         ).length;
 
+        // Fetch chats
+        const chatsResponse = await fetch(`${API_BASE_URL}/chats/me`, {
+          headers,
+        });
+
+        if (!chatsResponse.ok) {
+          throw new Error(`Failed to fetch chats: ${chatsResponse.statusText}`);
+        }
+
+        const chatsData = await chatsResponse.json();
+
+        // Count the entries (assuming data is an array)
+        const totalChats = Array.isArray(chatsData)
+          ? chatsData.length
+          : Object.keys(chatsData).length;
+
+        console.log("Number of chats:", totalChats);
+
+        // Set analytics
         setAnalytics({
           totalBooks,
           booksReady,
           booksProcessing,
-          totalChats: 0, // You'll need to add a chats endpoint to get this
-          totalMessages: 0, // You'll need to add a chats endpoint to get this
+          totalChats, // Fixed
         });
       } catch (err) {
         console.error("Dashboard fetch error:", err);
@@ -152,7 +171,6 @@ export default function DashboardPage() {
           err.message.includes("expired")
         ) {
           localStorage.removeItem("accessToken");
-          // Redirect to login page
           window.location.href = "/login"; // Adjust this to your login route
         }
       } finally {

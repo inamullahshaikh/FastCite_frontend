@@ -1,27 +1,38 @@
-import React, { useState, useEffect } from 'react';
-import { 
-  LayoutDashboard, 
-  PlusSquare, 
-  FileUp, 
-  Library, 
+import React, { useState, useEffect } from "react";
+import {
+  LayoutDashboard,
+  PlusSquare,
+  FileUp,
+  Library,
   User,
   LogOut,
-  Trash2
-} from 'lucide-react';
+  Trash2,
+} from "lucide-react";
 import logo from "../assets/logo.png";
 import { useNavigate, useLocation } from "react-router-dom";
-
+import ThemeToggle from "../context/themetoggle";
 // API Base URL - update this to match your backend
-const API_BASE_URL ='http://localhost:8000';
+const API_BASE_URL = "http://localhost:8000";
 
 // Reusable NavLink component for styling with navigation
-const NavLink = ({ path, icon: Icon, children, isPrimary = false, isActive = false, onClick }) => {
+const NavLink = ({
+  path,
+  icon: Icon,
+  children,
+  isPrimary = false,
+  isActive = false,
+  onClick,
+}) => {
   const navigate = useNavigate();
-  
-  const baseStyle = "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors duration-150 cursor-pointer";
-  const primaryStyle = "bg-[var(--color-accent-primary)] text-white font-semibold hover:bg-[var(--color-accent-hover)]";
-  const activeStyle = "bg-[var(--color-surface-secondary)] text-[var(--color-accent-primary)] font-semibold";
-  const secondaryStyle = "text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-secondary)] hover:text-[var(--color-text-primary)]";
+
+  const baseStyle =
+    "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors duration-150 cursor-pointer";
+  const primaryStyle =
+    "bg-[var(--color-accent-primary)] text-white font-semibold hover:bg-[var(--color-accent-hover)]";
+  const activeStyle =
+    "bg-[var(--color-surface-secondary)] text-[var(--color-accent-primary)] font-semibold";
+  const secondaryStyle =
+    "text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-secondary)] hover:text-[var(--color-text-primary)]";
 
   const handleClick = (e) => {
     e.preventDefault();
@@ -36,7 +47,9 @@ const NavLink = ({ path, icon: Icon, children, isPrimary = false, isActive = fal
   return (
     <div
       onClick={handleClick}
-      className={`${baseStyle} ${isPrimary ? primaryStyle : isActive ? activeStyle : secondaryStyle}`}
+      className={`${baseStyle} ${
+        isPrimary ? primaryStyle : isActive ? activeStyle : secondaryStyle
+      }`}
     >
       <Icon className="w-5 h-5" />
       <span>{children}</span>
@@ -52,7 +65,7 @@ const ChatLink = ({ chatId, title, isActive, onDelete }) => {
 
   const handleClick = (e) => {
     // Don't navigate if clicking the delete button
-    if (e.target.closest('.delete-btn')) return;
+    if (e.target.closest(".delete-btn")) return;
     navigate(`/chat/${chatId}`);
   };
 
@@ -60,13 +73,13 @@ const ChatLink = ({ chatId, title, isActive, onDelete }) => {
     e.stopPropagation();
     if (isDeleting) return;
 
-    if (window.confirm('Are you sure you want to delete this chat?')) {
+    if (window.confirm("Are you sure you want to delete this chat?")) {
       setIsDeleting(true);
       try {
         await onDelete(chatId);
       } catch (error) {
-        console.error('Failed to delete chat:', error);
-        alert('Failed to delete chat. Please try again.');
+        console.error("Failed to delete chat:", error);
+        alert("Failed to delete chat. Please try again.");
         setIsDeleting(false);
       }
     }
@@ -78,9 +91,9 @@ const ChatLink = ({ chatId, title, isActive, onDelete }) => {
       onMouseEnter={() => setShowDelete(true)}
       onMouseLeave={() => setShowDelete(false)}
       className={`group relative flex items-center justify-between px-3 py-2.5 rounded-lg text-sm transition-colors duration-150 cursor-pointer ${
-        isActive 
-          ? 'bg-[var(--color-surface-secondary)] text-[var(--color-accent-primary)] font-medium' 
-          : 'text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-secondary)] hover:text-[var(--color-text-primary)]'
+        isActive
+          ? "bg-[var(--color-surface-secondary)] text-[var(--color-accent-primary)] font-medium"
+          : "text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-secondary)] hover:text-[var(--color-text-primary)]"
       }`}
     >
       <span className="truncate pr-2">{title}</span>
@@ -114,8 +127,8 @@ export default function Sidebar() {
     try {
       setIsLoading(true);
       setError(null);
-      
-      const token = localStorage.getItem('accessToken');
+
+      const token = localStorage.getItem("accessToken");
       if (!token) {
         setIsLoading(false);
         return;
@@ -123,25 +136,25 @@ export default function Sidebar() {
 
       const response = await fetch(`${API_BASE_URL}/chats/me`, {
         headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
       });
 
       if (!response.ok) {
-        throw new Error('Failed to fetch chats');
+        throw new Error("Failed to fetch chats");
       }
 
       const data = await response.json();
-      
+
       // Sort by updated_at in descending order (newest first)
-      const sortedChats = data.sort((a, b) => 
-        new Date(b.updated_at) - new Date(a.updated_at)
+      const sortedChats = data.sort(
+        (a, b) => new Date(b.updated_at) - new Date(a.updated_at)
       );
-      
+
       setChats(sortedChats);
     } catch (err) {
-      console.error('Error fetching chats:', err);
+      console.error("Error fetching chats:", err);
       setError(err.message);
     } finally {
       setIsLoading(false);
@@ -150,31 +163,31 @@ export default function Sidebar() {
 
   // Delete chat handler
   const handleDeleteChat = async (chatId) => {
-    const token = localStorage.getItem('accessToken');
+    const token = localStorage.getItem("accessToken");
     if (!token) return;
 
     try {
       const response = await fetch(`${API_BASE_URL}/chats/${chatId}`, {
-        method: 'DELETE',
+        method: "DELETE",
         headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
       });
 
       if (!response.ok) {
-        throw new Error('Failed to delete chat');
+        throw new Error("Failed to delete chat");
       }
 
       // Remove chat from local state
-      setChats(prevChats => prevChats.filter(chat => chat.id !== chatId));
-      
+      setChats((prevChats) => prevChats.filter((chat) => chat.id !== chatId));
+
       // If we're currently viewing this chat, redirect to dashboard
       if (location.pathname === `/chat/${chatId}`) {
-        navigate('/dashboard');
+        navigate("/dashboard");
       }
     } catch (err) {
-      console.error('Error deleting chat:', err);
+      console.error("Error deleting chat:", err);
       throw err;
     }
   };
@@ -201,7 +214,6 @@ export default function Sidebar() {
 
   return (
     <div className="h-screen w-72 flex flex-col bg-[var(--color-surface-primary)] border-r border-[var(--color-border-primary)]">
-      
       {/* Custom CSS for a dark, minimal scrollbar */}
       <style>
         {`
@@ -237,46 +249,44 @@ export default function Sidebar() {
       <div className="flex-shrink-0">
         {/* Logo and App Name */}
         <div className="flex items-center gap-2 sm:gap-3 p-6">
-          <img 
+          <img
             src={logo}
-            alt="FastCite Logo" 
+            alt="FastCite Logo"
             className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg object-contain"
             onError={(e) => {
               e.target.onerror = null;
               e.target.src = logoUrl;
             }}
           />
-          <span className="text-xl font-bold text-[var(--color-text-primary)]">FastCite</span>
+          <span className="text-xl font-bold text-[var(--color-text-primary)]">
+            FastCite
+          </span>
         </div>
 
         {/* Main Navigation */}
         <nav className="px-4 pb-4">
           <div className="space-y-2">
-            <NavLink 
-              path="/new-chat" 
-              icon={PlusSquare} 
-              isPrimary={true}
-            >
+            <NavLink path="/new-chat" icon={PlusSquare} isPrimary={true}>
               New Chat
             </NavLink>
-            <NavLink 
-              path="/dashboard" 
+            <NavLink
+              path="/dashboard"
               icon={LayoutDashboard}
-              isActive={isPathActive('/dashboard')}
+              isActive={isPathActive("/dashboard")}
             >
               Dashboard
             </NavLink>
-            <NavLink 
-              path="/upload" 
+            <NavLink
+              path="/upload"
               icon={FileUp}
-              isActive={isPathActive('/upload')}
+              isActive={isPathActive("/upload")}
             >
               Upload Document
             </NavLink>
-            <NavLink 
-              path="/manage" 
+            <NavLink
+              path="/manage"
               icon={Library}
-              isActive={isPathActive('/manage')}
+              isActive={isPathActive("/manage")}
             >
               Manage Uploads
             </NavLink>
@@ -292,7 +302,7 @@ export default function Sidebar() {
             Previous Chats
           </span>
         </div>
-        
+
         {/* Chat List */}
         <div className="space-y-1 pb-4">
           {isLoading ? (
@@ -308,11 +318,11 @@ export default function Sidebar() {
               No chats yet. Start a new chat!
             </div>
           ) : (
-            chats.map(chat => (
-              <ChatLink 
+            chats.map((chat) => (
+              <ChatLink
                 key={chat.id}
                 chatId={chat.id}
-                title={chat.title || 'Untitled Chat'}
+                title={chat.title || "Untitled Chat"}
                 isActive={isChatActive(chat.id)}
                 onDelete={handleDeleteChat}
               />
@@ -324,23 +334,21 @@ export default function Sidebar() {
       {/* 3. Bottom Section (User Profile) - Fixed */}
       <div className="flex-shrink-0 p-4 border-t border-[var(--color-border-primary)]">
         <div className="space-y-2">
-          <NavLink 
-            path="/profile" 
+          <NavLink
+            path="/profile"
             icon={User}
-            isActive={isPathActive('/profile')}
+            isActive={isPathActive("/profile")}
           >
             My Profile
           </NavLink>
-          <NavLink 
-            path="/login" 
-            icon={LogOut}
-            onClick={handleLogout}
-          >
+          <NavLink path="/login" icon={LogOut} onClick={handleLogout}>
             Log Out
           </NavLink>
         </div>
       </div>
-
+      <div className="mt-auto p-4 border-t border-[var(--color-border-primary)]">
+        <ThemeToggle />
+      </div>
     </div>
   );
 }

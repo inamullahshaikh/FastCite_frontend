@@ -9,10 +9,11 @@ import SignupPage from "./pages/SignUpPage";
 import LoginPage from "./pages/LoginPage";
 import DashboardPage from "./pages/dashboard";
 import GoogleRedirectHandler from "./pages/GoogleRedirectHandler"; // create this
-import UploadPage from "./pages/uploadbook"
+import UploadPage from "./pages/uploadbook";
 import ManageBooksPage from "./pages/managebooks";
 import NewChatPage from "./pages/newchat";
-
+import ChatHistoryPage from "./pages/chat";
+import ProfilePage from "./pages/profile";
 const RootRedirect = () => {
   const accessToken = localStorage.getItem("accessToken");
 
@@ -38,9 +39,12 @@ function App() {
         <Route path="/" element={<RootRedirect />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignupPage />} />
-        
+
         {/* Google OAuth callback */}
-        <Route path="/auth/google/callback" element={<GoogleRedirectHandler />} />
+        <Route
+          path="/auth/google/callback"
+          element={<GoogleRedirectHandler />}
+        />
 
         {/* Protected dashboard */}
         <Route
@@ -52,8 +56,10 @@ function App() {
           }
         />
         <Route path="/upload" element={<UploadPage />} />
-        <Route path="/new-chat" element={<NewChatPage/>}/>
-        <Route path="/manage" element={<ManageBooksPage/>} />
+        <Route path="/new-chat" element={<NewChatPage />} />
+        <Route path="/manage" element={<ManageBooksPage />} />
+        <Route path="/chat/:chatId" element={<ChatHistoryPage />} />
+        <Route path="/profile" element={<ProfilePage />} />
       </Routes>
     </Router>
   );
