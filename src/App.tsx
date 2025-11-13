@@ -12,6 +12,16 @@ import GoogleRedirectHandler from "./pages/GoogleRedirectHandler"; // create thi
 import UploadPage from "./pages/uploadbook"
 import ManageBooksPage from "./pages/managebooks";
 import NewChatPage from "./pages/newchat";
+
+const RootRedirect = () => {
+  const accessToken = localStorage.getItem("accessToken");
+
+  if (accessToken) {
+    return <Navigate to="/dashboard" replace />;
+  } else {
+    return <Navigate to="/login" replace />;
+  }
+};
 // ProtectedRoute component
 const ProtectedRoute = ({ children }: { children: JSX.Element }) => {
   const token = localStorage.getItem("access_token");
@@ -25,7 +35,7 @@ function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<Navigate to="/login" replace />} />
+        <Route path="/" element={<RootRedirect />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignupPage />} />
         

@@ -1,33 +1,18 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   LayoutDashboard, 
   PlusSquare, 
   FileUp, 
   Library, 
   User,
-  LogOut
+  LogOut,
+  Trash2
 } from 'lucide-react';
 import logo from "../assets/logo.png";
 import { useNavigate, useLocation } from "react-router-dom";
 
-// Mock data for previous chats - replace this with your actual data
-const mockChats = [
-  { id: 1, title: 'History of Roman Empire' },
-  { id: 2, title: 'Introduction to Quantum Physics' },
-  { id: 3, title: 'Shakespearean Sonnets Analysis' },
-  { id: 4, title: 'React Hooks vs. Class Components' },
-  { id: 5, title: 'Sustainable Energy Sources' },
-  { id: 6, title: 'French Revolution Key Events' },
-  { id: 7, title: 'AI in Modern Medicine' },
-  { id: 8, title: 'Deep Sea Exploration Tech' },
-  { id: 9, title: 'The Future of Urban Planning' },
-  { id: 10, title: 'Understanding Macroeconomics' },
-  { id: 11, title: 'Cold War Politics Summary' },
-  { id: 12, title: 'Impressionist Art Movement' },
-  { id: 13, title: 'How do LLMs work?' },
-  { id: 14, title: 'Business Plan for a Startup' },
-  { id: 15, title: 'Benefits of Mindfulness' },
-];
+// API Base URL - update this to match your backend
+const API_BASE_URL ='http://localhost:8000';
 
 // Reusable NavLink component for styling with navigation
 const NavLink = ({ path, icon: Icon, children, isPrimary = false, isActive = false, onClick }) => {
@@ -59,24 +44,56 @@ const NavLink = ({ path, icon: Icon, children, isPrimary = false, isActive = fal
   );
 };
 
-// Reusable ChatLink component for styling with navigation
-const ChatLink = ({ chatId, title, isActive }) => {
+// Reusable ChatLink component with delete functionality
+const ChatLink = ({ chatId, title, isActive, onDelete }) => {
   const navigate = useNavigate();
+  const [showDelete, setShowDelete] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
-  const handleClick = () => {
+  const handleClick = (e) => {
+    // Don't navigate if clicking the delete button
+    if (e.target.closest('.delete-btn')) return;
     navigate(`/chat/${chatId}`);
+  };
+
+  const handleDelete = async (e) => {
+    e.stopPropagation();
+    if (isDeleting) return;
+
+    if (window.confirm('Are you sure you want to delete this chat?')) {
+      setIsDeleting(true);
+      try {
+        await onDelete(chatId);
+      } catch (error) {
+        console.error('Failed to delete chat:', error);
+        alert('Failed to delete chat. Please try again.');
+        setIsDeleting(false);
+      }
+    }
   };
 
   return (
     <div
       onClick={handleClick}
-      className={`block truncate px-3 py-2.5 rounded-lg text-sm transition-colors duration-150 cursor-pointer ${
+      onMouseEnter={() => setShowDelete(true)}
+      onMouseLeave={() => setShowDelete(false)}
+      className={`group relative flex items-center justify-between px-3 py-2.5 rounded-lg text-sm transition-colors duration-150 cursor-pointer ${
         isActive 
           ? 'bg-[var(--color-surface-secondary)] text-[var(--color-accent-primary)] font-medium' 
           : 'text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-secondary)] hover:text-[var(--color-text-primary)]'
       }`}
     >
-      {title}
+      <span className="truncate pr-2">{title}</span>
+      {showDelete && (
+        <button
+          className="delete-btn flex-shrink-0 p-1.5 rounded-md hover:bg-red-500/10 text-red-500 hover:text-red-600 transition-colors"
+          onClick={handleDelete}
+          disabled={isDeleting}
+          title="Delete chat"
+        >
+          <Trash2 className="w-4 h-4" />
+        </button>
+      )}
     </div>
   );
 };
@@ -84,6 +101,83 @@ const ChatLink = ({ chatId, title, isActive }) => {
 export default function Sidebar() {
   const navigate = useNavigate();
   const location = useLocation();
+  const [chats, setChats] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  // Fetch chats from API
+  useEffect(() => {
+    fetchChats();
+  }, []);
+
+  const fetchChats = async () => {
+    try {
+      setIsLoading(true);
+      setError(null);
+      
+      const token = localStorage.getItem('accessToken');
+      if (!token) {
+        setIsLoading(false);
+        return;
+      }
+
+      const response = await fetch(`${API_BASE_URL}/chats/me`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch chats');
+      }
+
+      const data = await response.json();
+      
+      // Sort by updated_at in descending order (newest first)
+      const sortedChats = data.sort((a, b) => 
+        new Date(b.updated_at) - new Date(a.updated_at)
+      );
+      
+      setChats(sortedChats);
+    } catch (err) {
+      console.error('Error fetching chats:', err);
+      setError(err.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Delete chat handler
+  const handleDeleteChat = async (chatId) => {
+    const token = localStorage.getItem('accessToken');
+    if (!token) return;
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/chats/${chatId}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to delete chat');
+      }
+
+      // Remove chat from local state
+      setChats(prevChats => prevChats.filter(chat => chat.id !== chatId));
+      
+      // If we're currently viewing this chat, redirect to dashboard
+      if (location.pathname === `/chat/${chatId}`) {
+        navigate('/dashboard');
+      }
+    } catch (err) {
+      console.error('Error deleting chat:', err);
+      throw err;
+    }
+  };
 
   // Logout handler
   const handleLogout = (e) => {
@@ -193,7 +287,7 @@ export default function Sidebar() {
       {/* 2. Middle Section (Chat History) - Scrollable */}
       <div className="flex-1 overflow-y-auto px-4 custom-scrollbar">
         {/* Header for chat list */}
-        <div className="h-10 flex items-center sticky top-0 bg-[var(--color-surface-primary)]">
+        <div className="h-10 flex items-center sticky top-0 bg-[var(--color-surface-primary)] z-10">
           <span className="text-xs font-medium uppercase text-[var(--color-text-tertiary)] tracking-wider">
             Previous Chats
           </span>
@@ -201,14 +295,29 @@ export default function Sidebar() {
         
         {/* Chat List */}
         <div className="space-y-1 pb-4">
-          {mockChats.map(chat => (
-            <ChatLink 
-              key={chat.id}
-              chatId={chat.id}
-              title={chat.title}
-              isActive={isChatActive(chat.id)}
-            />
-          ))}
+          {isLoading ? (
+            <div className="text-center py-4 text-[var(--color-text-tertiary)] text-sm">
+              Loading chats...
+            </div>
+          ) : error ? (
+            <div className="text-center py-4 text-red-500 text-sm">
+              Failed to load chats
+            </div>
+          ) : chats.length === 0 ? (
+            <div className="text-center py-4 text-[var(--color-text-tertiary)] text-sm">
+              No chats yet. Start a new chat!
+            </div>
+          ) : (
+            chats.map(chat => (
+              <ChatLink 
+                key={chat.id}
+                chatId={chat.id}
+                title={chat.title || 'Untitled Chat'}
+                isActive={isChatActive(chat.id)}
+                onDelete={handleDeleteChat}
+              />
+            ))
+          )}
         </div>
       </div>
 
