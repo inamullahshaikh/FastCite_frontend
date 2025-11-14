@@ -290,6 +290,62 @@ const BookSelector = ({
   );
 };
 
+const TypingMessage = ({ content, onComplete }) => {
+  const [displayedContent, setDisplayedContent] = useState('');
+  const [isTyping, setIsTyping] = useState(true);
+  
+  useEffect(() => {
+    if (!content) return;
+    
+    let currentIndex = 0;
+    const typingSpeed = 1;
+    
+    const interval = setInterval(() => {
+      if (currentIndex < content.length) {
+        setDisplayedContent(content.slice(0, currentIndex + 1));
+        currentIndex++;
+      } else {
+        setIsTyping(false);
+        clearInterval(interval);
+        if (onComplete) onComplete();
+      }
+    }, typingSpeed);
+    
+    return () => clearInterval(interval);
+  }, [content, onComplete]);
+  
+  return (
+    <div className="prose prose-sm max-w-none">
+      <ReactMarkdown
+        components={{
+          h1: ({node, ...props}) => <h1 className="text-2xl font-bold mt-4 mb-2 text-[var(--color-text-primary)]" {...props} />,
+          h2: ({node, ...props}) => <h2 className="text-xl font-bold mt-3 mb-2 text-[var(--color-text-primary)]" {...props} />,
+          h3: ({node, ...props}) => <h3 className="text-lg font-semibold mt-3 mb-1 text-[var(--color-text-primary)]" {...props} />,
+          p: ({node, ...props}) => <p className="mb-2 text-[var(--color-text-primary)] leading-relaxed" {...props} />,
+          ul: ({node, ...props}) => <ul className="list-disc list-inside mb-2 space-y-1 text-[var(--color-text-primary)]" {...props} />,
+          ol: ({node, ...props}) => <ol className="list-decimal list-inside mb-2 space-y-1 text-[var(--color-text-primary)]" {...props} />,
+          li: ({node, ...props}) => <li className="ml-4 text-[var(--color-text-primary)]" {...props} />,
+          strong: ({node, ...props}) => <strong className="font-semibold text-[var(--color-text-primary)]" {...props} />,
+          em: ({node, ...props}) => <em className="italic text-[var(--color-text-primary)]" {...props} />,
+          code: ({node, inline, ...props}) => 
+            inline ? (
+              <code className="bg-[var(--color-surface-hover)] px-1 py-0.5 rounded text-sm font-mono text-[var(--color-accent-primary)]" {...props} />
+            ) : (
+              <code className="block bg-[var(--color-surface-hover)] p-3 rounded-lg text-sm font-mono overflow-x-auto mb-2" {...props} />
+            ),
+          blockquote: ({node, ...props}) => (
+            <blockquote className="border-l-4 border-[var(--color-accent-primary)] pl-4 italic my-2 text-[var(--color-text-secondary)]" {...props} />
+          ),
+        }}
+      >
+        {displayedContent}
+      </ReactMarkdown>
+      {isTyping && (
+        <span className="inline-block w-2 h-4 bg-[var(--color-accent-primary)] animate-pulse ml-1"></span>
+      )}
+    </div>
+  );
+};
 // Main Chat History Component
 const ChatHistoryPage = () => {
   const { chatId } = useParams();
@@ -387,6 +443,10 @@ const ChatHistoryPage = () => {
 
           // Add assistant answer
           if (msg.answer) {
+            const ERROR_MESSAGE = "Error: 503 UNAVAILABLE. {'error': {'code': 503, 'message': 'The model is overloaded. Please try again later.', 'status': 'UNAVAILABLE'}}";
+          if (msg.answer === ERROR_MESSAGE) {
+            msg.answer = "⚠️ **Service Temporarily Unavailable**\n\nThe AI model is currently experiencing high demand. Please wait a moment and try again.";
+          }
             formattedMessages.push({
               role: "assistant",
               content: msg.answer,

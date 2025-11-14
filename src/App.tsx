@@ -8,27 +8,31 @@ import {
 import SignupPage from "./pages/SignUpPage";
 import LoginPage from "./pages/LoginPage";
 import DashboardPage from "./pages/dashboard";
-import GoogleRedirectHandler from "./pages/GoogleRedirectHandler"; // create this
+import GoogleRedirectHandler from "./pages/GoogleRedirectHandler";
 import UploadPage from "./pages/uploadbook";
 import ManageBooksPage from "./pages/managebooks";
 import NewChatPage from "./pages/newchat";
 import ChatHistoryPage from "./pages/chat";
 import ProfilePage from "./pages/profile";
+
 const RootRedirect = () => {
   const accessToken = localStorage.getItem("accessToken");
 
-  if (accessToken) {
-    return <Navigate to="/dashboard" replace />;
-  } else {
-    return <Navigate to="/login" replace />;
-  }
+  return accessToken ? (
+    <Navigate to="/dashboard" replace />
+  ) : (
+    <Navigate to="/login" replace />
+  );
 };
+
 // ProtectedRoute component
 const ProtectedRoute = ({ children }: { children: JSX.Element }) => {
-  const token = localStorage.getItem("access_token");
+  const token = localStorage.getItem("accessToken"); // fixed key
+
   if (!token) {
     return <Navigate to="/login" replace />;
   }
+
   return children;
 };
 
@@ -46,7 +50,7 @@ function App() {
           element={<GoogleRedirectHandler />}
         />
 
-        {/* Protected dashboard */}
+        {/* Protected routes */}
         <Route
           path="/dashboard"
           element={
@@ -55,11 +59,51 @@ function App() {
             </ProtectedRoute>
           }
         />
-        <Route path="/upload" element={<UploadPage />} />
-        <Route path="/new-chat" element={<NewChatPage />} />
-        <Route path="/manage" element={<ManageBooksPage />} />
-        <Route path="/chat/:chatId" element={<ChatHistoryPage />} />
-        <Route path="/profile" element={<ProfilePage />} />
+
+        <Route
+          path="/upload"
+          element={
+            <ProtectedRoute>
+              <UploadPage />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/new-chat"
+          element={
+            <ProtectedRoute>
+              <NewChatPage />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/manage"
+          element={
+            <ProtectedRoute>
+              <ManageBooksPage />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/chat/:chatId"
+          element={
+            <ProtectedRoute>
+              <ChatHistoryPage />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/setting"
+          element={
+            <ProtectedRoute>
+              <ProfilePage />
+            </ProtectedRoute>
+          }
+        />
       </Routes>
     </Router>
   );

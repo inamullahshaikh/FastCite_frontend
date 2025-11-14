@@ -346,6 +346,7 @@ export default function ManageBooksPage() {
   };
 
   return (
+    <div className="minimal-scrollbar overflow-auto h-full">
     <div className="flex h-screen bg-[var(--color-bg-primary)]">
       <Sidebar />
 
@@ -485,6 +486,7 @@ export default function ManageBooksPage() {
           onClose={() => setToast(null)}
         />
       )}
+    </div>
     </div>
   );
 }

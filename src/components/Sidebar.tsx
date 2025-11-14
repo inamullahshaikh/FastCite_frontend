@@ -335,11 +335,11 @@ export default function Sidebar() {
       <div className="flex-shrink-0 p-4 border-t border-[var(--color-border-primary)]">
         <div className="space-y-2">
           <NavLink
-            path="/profile"
+            path="/setting"
             icon={User}
-            isActive={isPathActive("/profile")}
+            isActive={isPathActive("/setting")}
           >
-            My Profile
+            Settings
           </NavLink>
           <NavLink path="/login" icon={LogOut} onClick={handleLogout}>
             Log Out

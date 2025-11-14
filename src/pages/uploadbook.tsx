@@ -387,170 +387,172 @@ export default function UploadPage() {
   };
 
   return (
-    <div className="flex h-screen bg-[var(--color-bg-primary)]">
-      {/* Sidebar Component */}
-      <Sidebar />
+    <div className="minimal-scrollbar overflow-auto h-full">
+      <div className="flex h-screen bg-[var(--color-bg-primary)]">
+        {/* Sidebar Component */}
+        <Sidebar />
 
-      {/* Main Content Area */}
-      <main className="flex-1 overflow-y-auto">
-        <div className="p-6 sm:p-8 space-y-8">
-          {/* Header */}
-          <div>
-            <h1 className="text-3xl font-bold text-[var(--color-text-primary)] mb-2">
-              Upload PDF
-            </h1>
-            <p className="text-base text-[var(--color-text-secondary)]">
-              Upload your PDF documents for processing and citation extraction
-            </p>
-          </div>
+        {/* Main Content Area */}
+        <main className="flex-1 overflow-y-auto">
+          <div className="p-6 sm:p-8 space-y-8">
+            {/* Header */}
+            <div>
+              <h1 className="text-3xl font-bold text-[var(--color-text-primary)] mb-2">
+                Upload PDF
+              </h1>
+              <p className="text-base text-[var(--color-text-secondary)]">
+                Upload your PDF documents for processing and citation extraction
+              </p>
+            </div>
 
-          {/* Error Message */}
-          {error && (
-            <ErrorMessage message={error} onDismiss={() => setError(null)} />
-          )}
+            {/* Error Message */}
+            {error && (
+              <ErrorMessage message={error} onDismiss={() => setError(null)} />
+            )}
 
-          {/* Upload Card */}
-          <div className="bg-[var(--color-surface-primary)] border border-[var(--color-border-primary)] rounded-2xl shadow-sm overflow-hidden">
-            <div className="p-6">
-              {/* Drop Zone */}
-              <div
-                onDragEnter={handleDrag}
-                onDragLeave={handleDrag}
-                onDragOver={handleDrag}
-                onDrop={handleDrop}
-                className={`relative border-2 border-dashed rounded-xl p-8 transition-all ${
-                  dragActive
-                    ? "border-[var(--color-accent-primary)] bg-[var(--color-accent-primary)]/5"
-                    : "border-[var(--color-border-secondary)]"
-                }`}
-              >
-                <div className="flex flex-col items-center justify-center text-center space-y-4">
-                  <div className="p-4 bg-[var(--color-accent-primary)]/10 rounded-full">
-                    <Upload className="w-8 h-8 text-[var(--color-accent-primary)]" />
-                  </div>
-
-                  {selectedFile ? (
-                    <div className="space-y-2">
-                      <div className="flex items-center gap-2 text-[var(--color-text-primary)] font-medium">
-                        <FileCheck className="w-5 h-5 text-green-500" />
-                        {selectedFile.name}
-                      </div>
-                      <p className="text-sm text-[var(--color-text-tertiary)]">
-                        {(selectedFile.size / 1024 / 1024).toFixed(2)} MB
-                      </p>
+            {/* Upload Card */}
+            <div className="bg-[var(--color-surface-primary)] border border-[var(--color-border-primary)] rounded-2xl shadow-sm overflow-hidden">
+              <div className="p-6">
+                {/* Drop Zone */}
+                <div
+                  onDragEnter={handleDrag}
+                  onDragLeave={handleDrag}
+                  onDragOver={handleDrag}
+                  onDrop={handleDrop}
+                  className={`relative border-2 border-dashed rounded-xl p-8 transition-all ${
+                    dragActive
+                      ? "border-[var(--color-accent-primary)] bg-[var(--color-accent-primary)]/5"
+                      : "border-[var(--color-border-secondary)]"
+                  }`}
+                >
+                  <div className="flex flex-col items-center justify-center text-center space-y-4">
+                    <div className="p-4 bg-[var(--color-accent-primary)]/10 rounded-full">
+                      <Upload className="w-8 h-8 text-[var(--color-accent-primary)]" />
                     </div>
-                  ) : (
-                    <>
-                      <div>
-                        <p className="text-base font-medium text-[var(--color-text-primary)] mb-1">
-                          Drop your PDF here, or{" "}
-                          <label className="text-[var(--color-accent-primary)] hover:text-[var(--color-accent-primary)]/80 cursor-pointer transition-colors">
-                            browse
-                            <input
-                              type="file"
-                              accept=".pdf"
-                              onChange={(e) =>
-                                handleFileSelect(e.target.files[0])
-                              }
-                              className="hidden"
-                            />
-                          </label>
-                        </p>
+
+                    {selectedFile ? (
+                      <div className="space-y-2">
+                        <div className="flex items-center gap-2 text-[var(--color-text-primary)] font-medium">
+                          <FileCheck className="w-5 h-5 text-green-500" />
+                          {selectedFile.name}
+                        </div>
                         <p className="text-sm text-[var(--color-text-tertiary)]">
-                          Supports: PDF files only
+                          {(selectedFile.size / 1024 / 1024).toFixed(2)} MB
                         </p>
                       </div>
-                    </>
+                    ) : (
+                      <>
+                        <div>
+                          <p className="text-base font-medium text-[var(--color-text-primary)] mb-1">
+                            Drop your PDF here, or{" "}
+                            <label className="text-[var(--color-accent-primary)] hover:text-[var(--color-accent-primary)]/80 cursor-pointer transition-colors">
+                              browse
+                              <input
+                                type="file"
+                                accept=".pdf"
+                                onChange={(e) =>
+                                  handleFileSelect(e.target.files[0])
+                                }
+                                className="hidden"
+                              />
+                            </label>
+                          </p>
+                          <p className="text-sm text-[var(--color-text-tertiary)]">
+                            Supports: PDF files only
+                          </p>
+                        </div>
+                      </>
+                    )}
+                  </div>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="flex gap-3 mt-6">
+                  <button
+                    onClick={handleUpload}
+                    disabled={!selectedFile || uploading}
+                    className="flex-1 px-6 py-3 bg-[var(--color-accent-primary)] text-white rounded-xl font-medium hover:bg-[var(--color-accent-primary)]/90 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2"
+                  >
+                    {uploading ? (
+                      <>
+                        <Loader2 className="w-5 h-5 animate-spin" />
+                        Uploading...
+                      </>
+                    ) : (
+                      <>
+                        <Upload className="w-5 h-5" />
+                        Upload PDF
+                      </>
+                    )}
+                  </button>
+                  {selectedFile && (
+                    <button
+                      onClick={() => setSelectedFile(null)}
+                      disabled={uploading}
+                      className="px-6 py-3 border border-[var(--color-border-primary)] text-[var(--color-text-secondary)] rounded-xl font-medium hover:bg-[var(--color-surface-secondary)] disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                    >
+                      Clear
+                    </button>
                   )}
                 </div>
               </div>
-
-              {/* Action Buttons */}
-              <div className="flex gap-3 mt-6">
-                <button
-                  onClick={handleUpload}
-                  disabled={!selectedFile || uploading}
-                  className="flex-1 px-6 py-3 bg-[var(--color-accent-primary)] text-white rounded-xl font-medium hover:bg-[var(--color-accent-primary)]/90 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2"
-                >
-                  {uploading ? (
-                    <>
-                      <Loader2 className="w-5 h-5 animate-spin" />
-                      Uploading...
-                    </>
-                  ) : (
-                    <>
-                      <Upload className="w-5 h-5" />
-                      Upload PDF
-                    </>
-                  )}
-                </button>
-                {selectedFile && (
-                  <button
-                    onClick={() => setSelectedFile(null)}
-                    disabled={uploading}
-                    className="px-6 py-3 border border-[var(--color-border-primary)] text-[var(--color-text-secondary)] rounded-xl font-medium hover:bg-[var(--color-surface-secondary)] disabled:opacity-50 disabled:cursor-not-allowed transition-all"
-                  >
-                    Clear
-                  </button>
-                )}
-              </div>
-            </div>
-          </div>
-
-          {/* Upload History */}
-          {uploadTasks.length > 0 && (
-            <div className="space-y-4">
-              <h2 className="text-xl font-semibold text-[var(--color-text-primary)]">
-                Recent Uploads
-              </h2>
-              <div className="space-y-3">
-                {uploadTasks.map((task) => (
-                  <UploadTaskCard
-                    key={task.task_id}
-                    task={task}
-                    onRefresh={() => checkTaskStatus(task.task_id)}
-                  />
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* My Books Section */}
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <h2 className="text-xl font-semibold text-[var(--color-text-primary)]">
-                My Books
-              </h2>
-              <button
-                onClick={fetchMyBooks}
-                disabled={loadingBooks}
-                className="text-sm text-[var(--color-accent-primary)] hover:text-[var(--color-accent-primary)]/80 font-medium transition-colors disabled:opacity-50"
-              >
-                {loadingBooks ? "Loading..." : "Refresh"}
-              </button>
             </div>
 
-            {loadingBooks ? (
-              <div className="flex items-center justify-center py-12">
-                <Loader2 className="w-8 h-8 text-[var(--color-accent-primary)] animate-spin" />
-              </div>
-            ) : myBooks.length > 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {myBooks.map((book) => (
-                  <BookCard key={book.id} book={book} />
-                ))}
-              </div>
-            ) : (
-              <div className="bg-[var(--color-surface-primary)] border border-[var(--color-border-primary)] rounded-xl p-8 text-center">
-                <Book className="w-12 h-12 text-[var(--color-text-tertiary)] mx-auto mb-3" />
-                <p className="text-[var(--color-text-secondary)]">
-                  No books uploaded yet. Upload your first PDF to get started!
-                </p>
+            {/* Upload History */}
+            {uploadTasks.length > 0 && (
+              <div className="space-y-4">
+                <h2 className="text-xl font-semibold text-[var(--color-text-primary)]">
+                  Recent Uploads
+                </h2>
+                <div className="space-y-3">
+                  {uploadTasks.map((task) => (
+                    <UploadTaskCard
+                      key={task.task_id}
+                      task={task}
+                      onRefresh={() => checkTaskStatus(task.task_id)}
+                    />
+                  ))}
+                </div>
               </div>
             )}
+
+            {/* My Books Section */}
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <h2 className="text-xl font-semibold text-[var(--color-text-primary)]">
+                  My Books
+                </h2>
+                <button
+                  onClick={fetchMyBooks}
+                  disabled={loadingBooks}
+                  className="text-sm text-[var(--color-accent-primary)] hover:text-[var(--color-accent-primary)]/80 font-medium transition-colors disabled:opacity-50"
+                >
+                  {loadingBooks ? "Loading..." : "Refresh"}
+                </button>
+              </div>
+
+              {loadingBooks ? (
+                <div className="flex items-center justify-center py-12">
+                  <Loader2 className="w-8 h-8 text-[var(--color-accent-primary)] animate-spin" />
+                </div>
+              ) : myBooks.length > 0 ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {myBooks.map((book) => (
+                    <BookCard key={book.id} book={book} />
+                  ))}
+                </div>
+              ) : (
+                <div className="bg-[var(--color-surface-primary)] border border-[var(--color-border-primary)] rounded-xl p-8 text-center">
+                  <Book className="w-12 h-12 text-[var(--color-text-tertiary)] mx-auto mb-3" />
+                  <p className="text-[var(--color-text-secondary)]">
+                    No books uploaded yet. Upload your first PDF to get started!
+                  </p>
+                </div>
+              )}
+            </div>
           </div>
-        </div>
-      </main>
+        </main>
+      </div>
     </div>
   );
 }

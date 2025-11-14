@@ -48,6 +48,7 @@
     --header-height: 64px;
     --sidebar-width: 280px;
     --input-height: 56px;
+    
   }
 
   /* Dark Theme - Your Original Design */
@@ -252,4 +253,22 @@
   .spinner {
     @apply animate-spin rounded-full border-2 border-[var(--color-border-primary)] border-t-[var(--color-accent-primary)];
   }
+}
+
+/* Global minimal scrollbar */
+.minimal-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.minimal-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.minimal-scrollbar::-webkit-scrollbar-thumb {
+  background-color: rgba(155, 155, 155, 0.5);
+  border-radius: 3px;
+}
+
+.minimal-scrollbar::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(155, 155, 155, 0.7);
 }
